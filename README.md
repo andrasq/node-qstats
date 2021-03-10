@@ -1,15 +1,16 @@
 qstats
 ======
 
-Simple Prometheus compatible application metrics store.  Fast and very small, with minimal
-hand-holding.  Compatible with `prom-pushgateway`.
+Simple Prometheus and `prom-client` compatible application metrics store.  Simple, fast,
+very small, with minimal hand-holding or overhead.  Compatible with `prom-pushgateway`.
 
 
 Quickstart
 ----------
 
 Metrics are tabulated by annotated name, and persist until reported (except counters, which
-retain their counts).  Annotations are optional.
+retain their counts).  Name annotations are optional.  Type and Help defintions are
+optional.
 
     var qstats = require('qstats');
     var metrics = new qstats.Stats();
@@ -20,7 +21,7 @@ retain their counts).  Annotations are optional.
     metrics.report();
     // => "# TYPE bar gauge" +
     //    "# HELP bar test value" +
-    //    "bar{color=blue} 2\n" +
+    //    "bar{color=blue} 3\n" +
 
 
 Api
@@ -32,13 +33,16 @@ Create a new metrics store.  Each store is independent of the others.
 
 ### metrics.reset( )
 
-Reset all metrics values to their initial unused state.
+Reset all metrics values to their initial undefined unreported state.
 
 ### metrics.delete( name, tags )
 
 Delete the metrics stored by the annotated name.  The `name` must be an ascii string without
 whitespace, the optional `tags` can be a string with comma-separated name=value pairs or a
 name-value hash.
+
+    metrics.delete('foo', 'a=2');
+    // remove `foo`, do not report it
 
 ### metrics.report( )
 
