@@ -13,7 +13,7 @@ retain their counts).  Name annotations are optional.  Type and Help defintions 
 optional.
 
     var qstats = require('qstats');
-    var metrics = new qstats.Stats();
+    var metrics = new qstats.Metrics();
 
     metrics.define('bar', 'gauge', 'test value');
     metrics.min('bar', {color: blue}, 7);

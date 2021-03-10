@@ -8,11 +8,11 @@
 'use strict';
 
 module.exports = {
-    Stats: Stats,
-    // Stat: Stat,
+    Metrics: Metrics,
+    // Metric: Metric,
 };
 
-function Stats( ) {
+function Metrics( ) {
     this.stats = {};    // tracked stats indexed by tagged name
     this.defs = {};
     this.names = {};    // defined stat names
@@ -31,7 +31,7 @@ function Stats( ) {
         delete this.defs[name];
     }
     this.set = function(name, tags, n) {
-        this._getStat(name, tags, n).set(this._getValue(tags, n));
+        this._getMetric(name, tags, n).set(this._getValue(tags, n));
     }
     this.get = function(name, tags) {
         var stats = this.stats[this._getName(name, tags)];
@@ -39,16 +39,16 @@ function Stats( ) {
     }
     this.count = function(name, tags, n) {
         if (n === undefined && typeof this._getValue(name, tags) !== 'number') n = 1;
-        this._getStat(name, tags, n).count(this._getValue(tags, n));
+        this._getMetric(name, tags, n).count(this._getValue(tags, n));
     }
     this.min = function(name, tags, n) {
-        this._getStat(name, tags, n).min(this._getValue(tags, n));
+        this._getMetric(name, tags, n).min(this._getValue(tags, n));
     }
     this.max = function(name, tags, n) {
-        this._getStat(name, tags, n).max(this._getValue(tags, n));
+        this._getMetric(name, tags, n).max(this._getValue(tags, n));
     }
     this.avg = function(name, tags, n) {
-        this._getStat(name, tags, n).avg(this._getValue(tags, n));
+        this._getMetric(name, tags, n).avg(this._getValue(tags, n));
     }
 
     this.report = function( ) {
@@ -75,9 +75,9 @@ function Stats( ) {
         return output;
     }
 
-    this._getStat = function(name, tags, n) {
+    this._getMetric = function(name, tags, n) {
         var statName = this._getName(name, tags);
-        return this.stats[statName] || (this.stats[statName] = new Stat(name, statName));
+        return this.stats[statName] || (this.stats[statName] = new Metric(name, statName));
     }
     this._getName = function(name, tags) {
         var label;
@@ -92,7 +92,7 @@ function Stats( ) {
 }
 
 
-function Stat( name, statName, help, type ) {
+function Metric( name, statName, help, type ) {
     this.name = name;           // stat canonical name "metric"
     this.statName = statName;   // stat specific name "metric{k1=v1,k2=v2}"
 
@@ -101,30 +101,30 @@ function Stat( name, statName, help, type ) {
 }
 
 // aka current()
-Stat.prototype.set = function set( v ) {
+Metric.prototype.set = function set( v ) {
     if (v >= -Infinity) { this.valueCount += 1; this.value = +v }
 }
-Stat.prototype.reset = function reset( ) {
+Metric.prototype.reset = function reset( ) {
     this.value = 0;
     this.valueCount = 0;
 }
-Stat.prototype.count = function count( n ) {
+Metric.prototype.count = function count( n ) {
     if (n >= -Infinity) { this.valueCount += 1; this.value += n }
 }
 // aka least()
-Stat.prototype.min = function min( v ) {
+Metric.prototype.min = function min( v ) {
     if (v >= -Infinity) { this.valueCount += 1; if (v < this.value || this.valueCount === 1) this.value = +v }
 }
 // aka most()
-Stat.prototype.max = function min( v ) {
+Metric.prototype.max = function min( v ) {
     if (v >= -Infinity) { this.valueCount += 1; if (v > this.value || this.valueCount === 1) this.value = +v }
 }
 // aka mean
-Stat.prototype.avg = function avg( v ) {
+Metric.prototype.avg = function avg( v ) {
     if (v >= -Infinity) { this.valueCount += 1;
         this.value = this.valueCount === 1 ? +v : (this.value * (this.valueCount - 1) + +v) / this.valueCount }
 }
-Stat.prototype.report = function report( ) {
+Metric.prototype.report = function report( ) {
     var output = '';
     if (this.valueCount > 0) {
         output += this.statName + ' ' + this.value + '\n';
@@ -132,6 +132,8 @@ Stat.prototype.report = function report( ) {
     return output;
 }
 
+Metric.prototype = toStruct(Metric.prototype)
+function toStruct(hash) { return toStruct.prototype = hash }
 
 function keyvals( obj ) {
     var keys = Object.keys(obj), tags = keys.length ? keys[0] + '=' + obj[keys[0]] : '';
