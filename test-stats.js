@@ -45,44 +45,44 @@ module.exports = {
             'does not alter value': function(t) {
                 this.uut.set('x', 123);
                 this.uut.define('x', 'gauge', 'test value');
-                t.equal(this.uut.get('x').value, 123);
+                t.equal(this.uut._getStat('x').value, 123);
                 t.done();
             },
         },
         'count': {
             'defaults to 0': function(t) {
-                t.equal(this.uut.get('xyz').value, 0);
+                t.equal(this.uut._getStat('xyz').value, 0);
                 this.uut.count('xyz');
-                t.equal(this.uut.get('xyz').value, 1);
+                t.equal(this.uut._getStat('xyz').value, 1);
                 t.done();
             },
             'adds to the count': function(t) {
                 this.uut.define('x');
                 this.uut.count('x', 1);
-                t.equal(this.uut.get('x').value, 1);
+                t.equal(this.uut._getStat('x').value, 1);
                 this.uut.count('x', 2);
-                t.equal(this.uut.get('x').value, 3);
+                t.equal(this.uut._getStat('x').value, 3);
                 this.uut.count('x', -4);
-                t.equal(this.uut.get('x').value, -1);
+                t.equal(this.uut._getStat('x').value, -1);
                 t.done();
             },
             'adds 1 by default': function(t) {
                 this.uut.set('x', 123);
                 this.uut.count('x');
                 this.uut.count('x');
-                t.equal(this.uut.get('x').value, 125);
+                t.equal(this.uut._getStat('x').value, 125);
                 t.done();
             },
             'resets to 0': function(t) {
                 this.uut.count('x');
                 this.uut.reset();
-                t.equal(this.uut.get('x').value, 0);
+                t.equal(this.uut._getStat('x').value, 0);
                 t.done();
             },
             'ignores a non-numeric count': function(t) {
                 this.uut.set('x', '', 1);
                 this.uut.count('x', '', 'ZZ');
-                t.equal(this.uut.get('x', '').value, 1);
+                t.equal(this.uut._getStat('x', '').value, 1);
                 t.done();
             },
         },
@@ -90,22 +90,22 @@ module.exports = {
             'sets the value': function(t) {
                 this.uut.set('x', 99);
                 this.uut.set('x', 1);
-                t.equal(this.uut.get('x').value, 1);
+                t.equal(this.uut._getStat('x').value, 1);
                 t.done();
             },
             'sets the annotated value': function(t) {
                 this.uut.set('x', 'a=1,b=2', 99);
                 this.uut.set('x', 'a=1', 2);
                 this.uut.set('x', 'a=2', 3);
-                t.equal(this.uut.get('x', {a:1}).value, 2);
-                t.equal(this.uut.get('x', {a:2}).value, 3);
-                t.equal(this.uut.get('x', {b:2}).value, 0);
+                t.equal(this.uut._getStat('x', {a:1}).value, 2);
+                t.equal(this.uut._getStat('x', {a:2}).value, 3);
+                t.equal(this.uut._getStat('x', {b:2}).value, 0);
                 t.done();
             },
             'ignores a non-numeric count': function(t) {
                 this.uut.set('x', '', 1);
                 this.uut.set('x', '', 'ZZ');
-                t.equal(this.uut.get('x', '').value, 1);
+                t.equal(this.uut._getStat('x', '').value, 1);
                 t.done();
             },
         },
@@ -115,18 +115,18 @@ module.exports = {
                 this.uut.min('x', 6);
                 this.uut.min('x', 3);
                 this.uut.min('x', 4);
-                t.equal(this.uut.get('x').value, 3);
+                t.equal(this.uut._getStat('x').value, 3);
 
                 this.uut.reset();
                 this.uut.min('x', 99);
-                t.equal(this.uut.get('x').value, 99);
+                t.equal(this.uut._getStat('x').value, 99);
 
                 t.done();
             },
             'ignores a non-numeric count': function(t) {
                 this.uut.min('x', '', 1);
                 this.uut.min('x', '', 'ZZ');
-                t.equal(this.uut.get('x', '').value, 1);
+                t.equal(this.uut._getStat('x', '').value, 1);
                 t.done();
             },
         },
@@ -136,18 +136,18 @@ module.exports = {
                 this.uut.max('x', 6);
                 this.uut.max('x', 3);
                 this.uut.max('x', 4);
-                t.equal(this.uut.get('x').value, 6);
+                t.equal(this.uut._getStat('x').value, 6);
 
                 this.uut.reset();
                 this.uut.min('x', 99);
-                t.equal(this.uut.get('x').value, 99);
+                t.equal(this.uut._getStat('x').value, 99);
 
                 t.done();
             },
             'ignores a non-numeric count': function(t) {
                 this.uut.max('x', '', 1);
                 this.uut.max('x', '', 'ZZ');
-                t.equal(this.uut.get('x', '').value, 1);
+                t.equal(this.uut._getStat('x', '').value, 1);
                 t.done();
             },
         },
@@ -157,18 +157,18 @@ module.exports = {
                 this.uut.avg('x', 6);
                 this.uut.avg('x', 3);
                 this.uut.avg('x', 4);
-                t.equal(this.uut.get('x').value, 4.5);
+                t.equal(this.uut._getStat('x').value, 4.5);
 
                 this.uut.reset();
                 this.uut.avg('x', 99);
-                t.equal(this.uut.get('x').value, 99);
+                t.equal(this.uut._getStat('x').value, 99);
 
                 t.done();
             },
             'ignores a non-numeric count': function(t) {
                 this.uut.avg('x', '', 1);
                 this.uut.avg('x', '', 'ZZ');
-                t.equal(this.uut.get('x', '').value, 1);
+                t.equal(this.uut._getStat('x', '').value, 1);
                 t.done();
             },
         },
@@ -177,8 +177,8 @@ module.exports = {
                 this.uut.set('x', 1);
                 this.uut.set('y', 2);
                 this.uut.reset();
-                t.equal(this.uut.get('x').value, 0);
-                t.equal(this.uut.get('y').value, 0);
+                t.equal(this.uut._getStat('x').value, 0);
+                t.equal(this.uut._getStat('y').value, 0);
                 t.done();
             },
         },
@@ -197,7 +197,7 @@ module.exports = {
                 this.uut.set('a', 1);
                 this.uut.set('b', 2);
                 this.uut.set('c', 3);
-                this.uut.get('c').reset();
+                this.uut._getStat('c').reset();
                 this.uut.define('b', 'gauge', 'test value');
                 t.equal(this.uut.report(), 'a 1\n\n# TYPE b gauge\n# HELP b test value\nb 2\n');
                 t.done();
@@ -206,14 +206,14 @@ module.exports = {
                 this.uut.set('x', 1);
                 this.uut.define('x', 'gauge');
                 this.uut.report();
-                t.equal(this.uut.get('x').value, 0);
+                t.equal(this.uut._getStat('x').value, 0);
                 t.done();
             },
             'does not reset a count': function(t) {
                 this.uut.set('x', 1);
                 this.uut.define('x', 'counter');
                 this.uut.report();
-                t.equal(this.uut.get('x').value, 1);
+                t.equal(this.uut._getStat('x').value, 1);
                 t.done();
             },
         },
@@ -232,7 +232,7 @@ module.exports = {
                 var a = this.uut._getStat('x');
                 var b = this.uut._getStat('x');
                 t.equal(a, b);
-                t.equal(this.uut.get('x'), a);
+                t.equal(this.uut._getStat('x'), a);
                 t.done();
             },
         },
