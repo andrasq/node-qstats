@@ -15,12 +15,16 @@ optional.
     var qstats = require('qstats');
     var metrics = new qstats.Metrics();
 
-    metrics.define('bar', 'gauge', 'test value');
+    metrics.set('foo', 1);
     metrics.min('bar', {color: blue}, 7);
     metrics.min('bar', 'color=blue', 3);
+    metrics.define('bar', 'gauge', 'test value');
+
     metrics.report();
-    // => "# TYPE bar gauge" +
-    //    "# HELP bar test value" +
+    // => "foo 1\n" +
+    //    "\n" +
+    //    "# TYPE bar gauge\n" +
+    //    "# HELP bar test value\n" +
     //    "bar{color=blue} 3\n" +
 
 
@@ -69,6 +73,7 @@ Metrics Values
 
 Define the `# TYPE` and `# HELP` information associated with metrics that have `name`.
 Types are `gauge`, `counter`.  Help strings are free-form but must not contain newlines.
+Once defined, the Type and Help for `name` will persist until `undefine()-d`.
 
 ### metrics.undefine( name )
 
