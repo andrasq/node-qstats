@@ -1,5 +1,5 @@
 /*
- * prometheus-compatible stats store
+ * prom-stats -- prometheus-compatible metrics store
  *
  * Copyright (C) 2021 Andras Radics
  * Licensed under the Apache License, Version 2.0
@@ -30,11 +30,12 @@ function Stats( ) {
         if (n === undefined && typeof this._getValue(name, tags) !== 'number') n = 1;
         this._getStat(name, tags, n).count(this._getValue(tags, n));
     }
-    this.get = function(name, tags) {
-        return this._getStat(name, tags, 1);
-    }
     this.set = function(name, tags, n) {
         this._getStat(name, tags, n).set(this._getValue(tags, n));
+    }
+    this.get = function(name, tags) {
+        var stats = this.stats[this._getName(name, tags)];
+        return stats ? stats.value : undefined;
     }
     this.min = function(name, tags, n) {
         this._getStat(name, tags, n).min(this._getValue(tags, n));

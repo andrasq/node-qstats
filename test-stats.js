@@ -109,6 +109,22 @@ module.exports = {
                 t.done();
             },
         },
+        'get': {
+            'retrieves the current value': function(t) {
+                t.strictEqual(this.uut.get('x'), undefined);
+                this.uut.avg('x', 1);
+                t.strictEqual(this.uut.get('x'), 1);
+                this.uut.avg('x', 2);
+                t.equal(this.uut.get('x'), 1.5);
+                this.uut.avg('x', 3);
+                t.equal(this.uut.get('x'), 2);
+                this.uut.avg('x', 4);
+                t.equal(this.uut.get('x'), 2.5);
+                this.uut.avg('x', 5);
+                t.equal(this.uut.get('x'), 3);
+                t.done();
+            },
+        },
         'min': {
             'tracks the lowest seen value': function(t) {
                 this.uut.min('x', 5);
