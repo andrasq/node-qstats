@@ -123,11 +123,7 @@ Metric.prototype.avg = function avg( v ) {
         this.value = this.valueCount === 1 ? +v : (this.value * (this.valueCount - 1) + +v) / this.valueCount }
 }
 Metric.prototype.report = function report( ) {
-    var output = '';
-    if (this.valueCount > 0) {
-        output += this.statName + ' ' + this.value + '\n';
-    }
-    return output;
+    return (this.valueCount > 0) ? this.statName + ' ' + this.value + '\n' : '';
 }
 Metric.prototype = toStruct(Metric.prototype)
 
