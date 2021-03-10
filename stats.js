@@ -26,16 +26,16 @@ function Stats( ) {
         this.types[name] = type || '';
         this.helps[name] = help || '';
     }
-    this.count = function(name, tags, n) {
-        if (n === undefined && typeof this._getValue(name, tags) !== 'number') n = 1;
-        this._getStat(name, tags, n).count(this._getValue(tags, n));
-    }
     this.set = function(name, tags, n) {
         this._getStat(name, tags, n).set(this._getValue(tags, n));
     }
     this.get = function(name, tags) {
         var stats = this.stats[this._getName(name, tags)];
         return stats ? stats.value : undefined;
+    }
+    this.count = function(name, tags, n) {
+        if (n === undefined && typeof this._getValue(name, tags) !== 'number') n = 1;
+        this._getStat(name, tags, n).count(this._getValue(tags, n));
     }
     this.min = function(name, tags, n) {
         this._getStat(name, tags, n).min(this._getValue(tags, n));

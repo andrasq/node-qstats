@@ -1,6 +1,6 @@
 {
-  "name": "",
-  "version": "0.0.0",
+  "name": "qstats",
+  "version": "0.1.0",
   "description": "",
   "main": "./stats",
   "files": ["stats.js", "README.md"],
