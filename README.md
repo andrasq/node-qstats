@@ -24,8 +24,8 @@ optional.
     //    "bar{color=blue} 3\n" +
 
 
-Api
----
+Metrics Store
+-------------
 
 ### metrics = qstats.Metrics( )
 
@@ -42,13 +42,13 @@ whitespace, the optional `tags` can be a string with comma-separated name=value 
 name-value hash.
 
     metrics.delete('foo', 'a=2');
-    // remove `foo`, do not report it
+    // remove the value of `foo{a=2}`, do not report it
 
 ### metrics.report( )
 
 Report the values of all stored metrics.  Metrics that have not been updated since last
 reset are omitted.  Returns a Prometheus metrics report string.
-Most metrics are transient and are automatically cleared on report(), excpet `counter`
+Most metrics are transient and are automatically cleared on report(), except `counter`
 types that must be cleared explicitly.
 
     metrics.max('hit', {x:1, y:2}, 99);
@@ -57,13 +57,13 @@ types that must be cleared explicitly.
 
     metrics.max('hit', {x:1, y:2}, 11);
     metrics.report();
-    // => "hit{x=1,y=2} 11\n" -- report() reset the old max
+    // => "hit{x=1,y=2} 11\n" -- report() reset the old, 11 is new max
 
     metrics.report()
     // => "" -- no updates since last time, nothing to report
 
-Metrics Store
--------------
+Metrics Values
+--------------
 
 ### metrics.define( name, type, help )
 
@@ -81,7 +81,7 @@ under the annotated name generated from `name` and the key-value pairs in `tags`
 
 ### metrics.get( name, [tags] )
 
-Return the current value of the metric.
+Return the current value of the metric, or `undefined` if never reported or deleted.
 
 ### metrics.count( name, [tags,] [increment] )
 
