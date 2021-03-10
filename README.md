@@ -85,8 +85,8 @@ Return the current value of the metric, or `undefined` if never reported or dele
 
 ### metrics.count( name, [tags,] [increment] )
 
-Increase the current value of the metric by `increment`.  If `increment` not provided, adds
-`1` one to the current value.
+Increase the current value of the metric by `increment`.  If `increment` is not provided,
+adds `1` one to the current value.
 
 ### metrics.min( name, [tags,], newValue )
 
