@@ -15,9 +15,6 @@ module.exports = {
 function Metrics( ) {
     this.stats = {};    // tracked stats indexed by tagged name
     this.defs = {};
-    this.names = {};    // defined stat names
-    this.types = {};    // defined stat types
-    this.helps = {};    // defined help descriptions
 }
 
 Metrics.prototype.reset = function reset() {
@@ -27,11 +24,9 @@ Metrics.prototype.delete = function delete_(name, tags) {
     delete this.stats[this._getName(name, tags)];
 }
 Metrics.prototype.define = function define(name, type, help) {
-    this.names[name] = name;
     this.defs[name] = { name: name, type: type || '', help: help || '' };
 }
 Metrics.prototype.undefine = function undefine(name) {
-    delete this.names[name];
     delete this.defs[name];
 }
 Metrics.prototype.set = function set(name, tags, n) {
