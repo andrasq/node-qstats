@@ -18,78 +18,81 @@ function Metrics( ) {
     this.names = {};    // defined stat names
     this.types = {};    // defined stat types
     this.helps = {};    // defined help descriptions
-
-    this.reset = function() { for (var k in this.stats) this.stats[k].reset() }
-    this.delete = function(name, tags) { delete this.stats[this._getName(name, tags)] }
-
-    this.define = function(name, type, help) {
-        this.names[name] = name;
-        this.defs[name] = { name: name, type: type || '', help: help || '' };
-    }
-    this.undefine = function(name) {
-        delete this.names[name];
-        delete this.defs[name];
-    }
-    this.set = function(name, tags, n) {
-        this._getMetric(name, tags, n).set(this._getValue(tags, n));
-    }
-    this.get = function(name, tags) {
-        var stats = this.stats[this._getName(name, tags)];
-        return stats ? stats.value : undefined;
-    }
-    this.count = function(name, tags, n) {
-        if (n === undefined && typeof this._getValue(name, tags) !== 'number') n = 1;
-        this._getMetric(name, tags, n).count(this._getValue(tags, n));
-    }
-    this.min = function(name, tags, n) {
-        this._getMetric(name, tags, n).min(this._getValue(tags, n));
-    }
-    this.max = function(name, tags, n) {
-        this._getMetric(name, tags, n).max(this._getValue(tags, n));
-    }
-    this.avg = function(name, tags, n) {
-        this._getMetric(name, tags, n).avg(this._getValue(tags, n));
-    }
-
-    this.report = function( ) {
-        var self = this;
-        var keys = Object.keys(this.stats).sort();
-        var stats = keys.map(function(key) { return self.stats[key] });
-        var described = {};
-
-        var output = '';
-        for (var i = 0; i < stats.length; i++) {
-            var name = stats[i].name;
-            var defs = this.defs[name] || {};
-            var report = stats[i].report();
-            if (!described[name] && report) {
-                if (output) output += '\n';
-                defs.type && (output += ('# TYPE ' + name + ' ' + defs.type + '\n'));
-                defs.help && (output += ('# HELP ' + name + ' ' + defs.help + '\n'));
-                described[stats[i].name] = true;
-            }
-            output += report;
-            // most stats are transient and last only over the polling interval
-            if (defs.type !== 'counter') stats[i].reset();
-        }
-        return output;
-    }
-
-    this._getMetric = function(name, tags, n) {
-        var statName = this._getName(name, tags);
-        return this.stats[statName] || (this.stats[statName] = new Metric(name, statName));
-    }
-    this._getName = function(name, tags) {
-        var label;
-        return (typeof tags === 'number') ? name
-            : (typeof tags === 'string' && tags) ? name + '{' + tags + '}'
-            : (typeof tags === 'object' && (label = keyvals(tags))) ? name + '{' + label + '}'
-            : name;
-    }
-    this._getValue = function(tags, n) {
-        return n !== undefined ? n : tags;
-    }
 }
+
+Metrics.prototype.reset = function reset() {
+    for (var k in this.stats) this.stats[k].reset();
+}
+Metrics.prototype.delete = function delete_(name, tags) {
+    delete this.stats[this._getName(name, tags)];
+}
+Metrics.prototype.define = function define(name, type, help) {
+    this.names[name] = name;
+    this.defs[name] = { name: name, type: type || '', help: help || '' };
+}
+Metrics.prototype.undefine = function undefine(name) {
+    delete this.names[name];
+    delete this.defs[name];
+}
+Metrics.prototype.set = function set(name, tags, n) {
+    this._getMetric(name, tags, n).set(this._getValue(tags, n));
+}
+Metrics.prototype.get = function get(name, tags) {
+    var stats = this.stats[this._getName(name, tags)];
+    return stats ? stats.value : undefined;
+}
+Metrics.prototype.count = function count(name, tags, n) {
+    if (n === undefined && typeof this._getValue(name, tags) !== 'number') n = 1;
+    this._getMetric(name, tags, n).count(this._getValue(tags, n));
+}
+Metrics.prototype.min = function min(name, tags, n) {
+    this._getMetric(name, tags, n).min(this._getValue(tags, n));
+}
+Metrics.prototype.max = function max(name, tags, n) {
+    this._getMetric(name, tags, n).max(this._getValue(tags, n));
+}
+Metrics.prototype.avg = function avg(name, tags, n) {
+    this._getMetric(name, tags, n).avg(this._getValue(tags, n));
+}
+Metrics.prototype.report = function report( ) {
+    var self = this;
+    var keys = Object.keys(this.stats).sort();
+    var stats = keys.map(function(key) { return self.stats[key] });
+    var described = {};
+
+    var output = '';
+    for (var i = 0; i < stats.length; i++) {
+        var name = stats[i].name;
+        var defs = this.defs[name] || {};
+        var report = stats[i].report();
+        if (!described[name] && report) {
+            if (output) output += '\n';
+            defs.type && (output += ('# TYPE ' + name + ' ' + defs.type + '\n'));
+            defs.help && (output += ('# HELP ' + name + ' ' + defs.help + '\n'));
+            described[stats[i].name] = true;
+        }
+        output += report;
+        // most stats are transient and last only over the polling interval
+        if (defs.type !== 'counter') stats[i].reset();
+    }
+    return output;
+}
+Metrics.prototype._getMetric = function _getMetric(name, tags, n) {
+    var statName = this._getName(name, tags);
+    return this.stats[statName] || (this.stats[statName] = new Metric(name, statName));
+}
+Metrics.prototype._getName = function _getName(name, tags) {
+    var label;
+    return (typeof tags === 'number') ? name
+        : (typeof tags === 'string' && tags) ? name + '{' + tags + '}'
+        : (typeof tags === 'object' && (label = keyvals(tags))) ? name + '{' + label + '}'
+        : name;
+}
+Metrics.prototype._getValue = function _getValue(tags, n) {
+    return n !== undefined ? n : tags;
+}
+
+Metrics.prototype = toStruct(Metrics.prototype)
 
 
 function Metric( name, statName, help, type ) {
@@ -131,8 +134,9 @@ Metric.prototype.report = function report( ) {
     }
     return output;
 }
-
 Metric.prototype = toStruct(Metric.prototype)
+
+
 function toStruct(hash) { return toStruct.prototype = hash }
 
 function keyvals( obj ) {
