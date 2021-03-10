@@ -70,6 +70,10 @@ Metrics Store
 Define the `# TYPE` and `# HELP` information associated with metrics that have `name`.
 Types are `gauge`, `counter`.  Help strings are free-form but must not contain newlines.
 
+### metrics.undefine( name )
+
+Forget the definition of metric `name`, report the metric bare without Type or Help.
+
 ### metrics.set( name, [tags,] value )
 
 Set the reported value of the metric.  Non-numeric values are ignored.  The metric is stored

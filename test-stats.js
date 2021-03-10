@@ -34,12 +34,9 @@ module.exports = {
         'define': {
             'sets type and help': function(t) {
                 this.uut.define('stat-name', 'stat-type', 'stat-help');
-                t.equal(this.uut.names['stat-name'], 'stat-name');
-                t.equal(this.uut.types['stat-name'], 'stat-type');
-                t.equal(this.uut.helps['stat-name'], 'stat-help');
+                t.contains(this.uut.defs['stat-name'], { type: 'stat-type', help: 'stat-help' });
                 this.uut.define('stat-name2');
-                t.equal(this.uut.types['stat-name2'], '');
-                t.equal(this.uut.helps['stat-name2'], '');
+                t.strictContains(this.uut.defs['stat-name2'], { type: '', help: '' });
                 t.done();
             },
             'does not alter value': function(t) {
@@ -49,40 +46,11 @@ module.exports = {
                 t.done();
             },
         },
-        'count': {
-            'defaults to 0': function(t) {
-                t.equal(this.uut._getStat('xyz').value, 0);
-                this.uut.count('xyz');
-                t.equal(this.uut._getStat('xyz').value, 1);
-                t.done();
-            },
-            'adds to the count': function(t) {
-                this.uut.define('x');
-                this.uut.count('x', 1);
-                t.equal(this.uut._getStat('x').value, 1);
-                this.uut.count('x', 2);
-                t.equal(this.uut._getStat('x').value, 3);
-                this.uut.count('x', -4);
-                t.equal(this.uut._getStat('x').value, -1);
-                t.done();
-            },
-            'adds 1 by default': function(t) {
-                this.uut.set('x', 123);
-                this.uut.count('x');
-                this.uut.count('x');
-                t.equal(this.uut._getStat('x').value, 125);
-                t.done();
-            },
-            'resets to 0': function(t) {
-                this.uut.count('x');
-                this.uut.reset();
-                t.equal(this.uut._getStat('x').value, 0);
-                t.done();
-            },
-            'ignores a non-numeric count': function(t) {
-                this.uut.set('x', '', 1);
-                this.uut.count('x', '', 'ZZ');
-                t.equal(this.uut._getStat('x', '').value, 1);
+        'undefine': {
+            'unsets type and help': function(t) {
+                this.uut.define('stat-name', 'stat-type', 'stat-help');
+                this.uut.undefine('stat-name');
+                t.strictEqual(this.uut.defs['stat-name'], undefined);
                 t.done();
             },
         },
@@ -122,6 +90,43 @@ module.exports = {
                 t.equal(this.uut.get('x'), 2.5);
                 this.uut.avg('x', 5);
                 t.equal(this.uut.get('x'), 3);
+                t.done();
+            },
+        },
+        'count': {
+            'defaults to 0': function(t) {
+                t.equal(this.uut._getStat('xyz').value, 0);
+                this.uut.count('xyz');
+                t.equal(this.uut._getStat('xyz').value, 1);
+                t.done();
+            },
+            'adds to the count': function(t) {
+                this.uut.define('x');
+                this.uut.count('x', 1);
+                t.equal(this.uut._getStat('x').value, 1);
+                this.uut.count('x', 2);
+                t.equal(this.uut._getStat('x').value, 3);
+                this.uut.count('x', -4);
+                t.equal(this.uut._getStat('x').value, -1);
+                t.done();
+            },
+            'adds 1 by default': function(t) {
+                this.uut.set('x', 123);
+                this.uut.count('x');
+                this.uut.count('x');
+                t.equal(this.uut._getStat('x').value, 125);
+                t.done();
+            },
+            'resets to 0': function(t) {
+                this.uut.count('x');
+                this.uut.reset();
+                t.equal(this.uut._getStat('x').value, 0);
+                t.done();
+            },
+            'ignores a non-numeric count': function(t) {
+                this.uut.set('x', '', 1);
+                this.uut.count('x', '', 'ZZ');
+                t.equal(this.uut._getStat('x', '').value, 1);
                 t.done();
             },
         },

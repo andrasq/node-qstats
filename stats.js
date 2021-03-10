@@ -14,6 +14,7 @@ module.exports = {
 
 function Stats( ) {
     this.stats = {};    // tracked stats indexed by tagged name
+    this.defs = {};
     this.names = {};    // defined stat names
     this.types = {};    // defined stat types
     this.helps = {};    // defined help descriptions
@@ -23,8 +24,11 @@ function Stats( ) {
 
     this.define = function(name, type, help) {
         this.names[name] = name;
-        this.types[name] = type || '';
-        this.helps[name] = help || '';
+        this.defs[name] = { name: name, type: type || '', help: help || '' };
+    }
+    this.undefine = function(name) {
+        delete this.names[name];
+        delete this.defs[name];
     }
     this.set = function(name, tags, n) {
         this._getStat(name, tags, n).set(this._getValue(tags, n));
@@ -56,17 +60,17 @@ function Stats( ) {
         var output = '';
         for (var i = 0; i < stats.length; i++) {
             var name = stats[i].name;
-            var type = this.types[name];
+            var defs = this.defs[name] || {};
             var report = stats[i].report();
             if (!described[name] && report) {
                 if (output) output += '\n';
-                this.types[name] && (output += ('# TYPE ' + name + ' ' + this.types[name] + '\n'));
-                this.helps[name] && (output += ('# HELP ' + name + ' ' + this.helps[name] + '\n'));
+                defs.type && (output += ('# TYPE ' + name + ' ' + defs.type + '\n'));
+                defs.help && (output += ('# HELP ' + name + ' ' + defs.help + '\n'));
                 described[stats[i].name] = true;
             }
             output += report;
             // most stats are transient and last only over the polling interval
-            if (this.types[name] !== 'counter') stats[i].reset();
+            if (defs.type !== 'counter') stats[i].reset();
         }
         return output;
     }
