@@ -75,7 +75,7 @@ Metrics Values
 ### metrics.define( name, type, help )
 
 Define the `# TYPE` and `# HELP` information associated with metrics that have `name`.
-Types are `gauge`, `counter`.  Help strings are free-form but must not contain newlines.
+Types are e.g. `gauge`, `counter`.  Help strings are free-form but must not contain newlines.
 Once defined, the Type and Help for `name` will persist until `undefine()-d`.
 
 ### metrics.undefine( name )
