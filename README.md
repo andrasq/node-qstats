@@ -1,8 +1,8 @@
 qstats
 ======
 [![Build Status](https://api.travis-ci.org/andrasq/node-qstats.svg?branch=master)](https://travis-ci.org/andrasq/node-qstats)
-<!-- [![Coverage Status](https://coveralls.io/repos/github/andrasq/node-qstats/badge.svg?branch=master)](https://coveralls.io/github/andrasq/node-qstats?branch=master) -->
 [![Coverage Status](https://codecov.io/github/andrasq/node-qstats/coverage.svg?branch=master)](https://codecov.io/github/andrasq/node-qstats?branch=master)
+<!-- [![Coverage Status](https://coveralls.io/repos/github/andrasq/node-qstats/badge.svg?branch=master)](https://coveralls.io/github/andrasq/node-qstats?branch=master) -->
 
 Simple Prometheus and `prom-client` compatible application metrics store.  Simple, fast,
 very small, with minimal hand-holding or overhead.  Compatible with `prom-pushgateway`.
