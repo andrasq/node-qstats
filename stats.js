@@ -13,22 +13,30 @@ module.exports = {
 };
 
 function Metrics( ) {
-    this.stats = {};    // tracked stats indexed by tagged name
-    this.defs = {};
+    this.stats = {};    // tracked stats indexed by annotated name
+    this.defs = {};     // metric Type and Help indexed by name
 }
 
+/*
+ * metrics store methods
+ */
 Metrics.prototype.reset = function reset() {
     for (var k in this.stats) this.stats[k].reset();
 }
 Metrics.prototype.delete = function delete_(name, tags) {
     delete this.stats[this._getName(name, tags)];
 }
+var _blankDef = { name: '', type: '', help: '' };
 Metrics.prototype.define = function define(name, type, help) {
     this.defs[name] = { name: name, type: type || '', help: help || '' };
 }
 Metrics.prototype.undefine = function undefine(name) {
     delete this.defs[name];
 }
+
+/*
+ * metric update methods
+ */
 Metrics.prototype.set = function set(name, tags, n) {
     this._getMetric(name, tags, n).set(this._getValue(tags, n));
 }
@@ -57,14 +65,14 @@ Metrics.prototype.report = function report( ) {
 
     var output = '';
     for (var i = 0; i < stats.length; i++) {
-        var name = stats[i].name;
-        var defs = this.defs[name] || {};
+        var name = stats[i].metricName;
+        var defs = this.defs[name] || _blankDef;
         var report = stats[i].report();
         if (!described[name] && report) {
             if (output) output += '\n';
             defs.type && (output += ('# TYPE ' + name + ' ' + defs.type + '\n'));
             defs.help && (output += ('# HELP ' + name + ' ' + defs.help + '\n'));
-            described[stats[i].name] = true;
+            described[stats[i].metricName] = true;
         }
         output += report;
         // most stats are transient and last only over the polling interval
@@ -73,8 +81,10 @@ Metrics.prototype.report = function report( ) {
     return output;
 }
 Metrics.prototype._getMetric = function _getMetric(name, tags, n) {
+    // TODO: allow or disallow non-defined metrics?
     var statName = this._getName(name, tags);
-    return this.stats[statName] || (this.stats[statName] = new Metric(name, statName));
+    var defs = this.defs[name] || _blankDef;
+    return this.stats[statName] || (this.stats[statName] = new Metric(name, statName, defs.type));
 }
 Metrics.prototype._getName = function _getName(name, tags) {
     var label;
@@ -91,8 +101,9 @@ Metrics.prototype = toStruct(Metrics.prototype)
 
 
 function Metric( name, statName, help, type ) {
-    this.name = name;           // stat canonical name "metric"
+    this.metricName = name;     // stat canonical name "metric"
     this.statName = statName;   // stat specific name "metric{k1=v1,k2=v2}"
+    this.metricType = type;     // type to support non-orthogonal stats
 
     this.value = 0;
     this.valueCount = 0;
@@ -103,8 +114,7 @@ Metric.prototype.set = function set( v ) {
     if (v >= -Infinity) { this.valueCount += 1; this.value = +v }
 }
 Metric.prototype.reset = function reset( ) {
-    this.value = 0;
-    this.valueCount = 0;
+    this.value = this.valueCount = 0;
 }
 Metric.prototype.count = function count( n ) {
     if (n >= -Infinity) { this.valueCount += 1; this.value += n }
